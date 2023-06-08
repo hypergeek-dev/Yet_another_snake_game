@@ -20,6 +20,14 @@ window_size = (window_width, window_height)
 screen = pygame.display.set_mode(window_size)
 pygame.display.set_caption("Advanced Snake Game")
 
+# Load the background image
+background_img = pygame.image.load("assets/graphic/background.png")
+background_img = pygame.transform.scale(background_img, window_size)
+
+# Load the game over image
+game_over_img = pygame.image.load("assets/graphic/game_over.png")
+game_over_img = pygame.transform.scale(game_over_img, window_size)
+
 # Set the snake's initial position and movement direction
 snake_pos = [(window_width // 2, window_height // 2)]
 snake_size = 20

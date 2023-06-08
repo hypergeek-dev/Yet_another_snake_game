@@ -93,3 +93,105 @@ def start_game():
     score = 0
     food_spawned = True
 
+# Main game loop
+running = True
+game_started = False  # Flag to check if the game has started
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        # Handle key presses
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                if not game_started:  # Start the game when Space is pressed
+                    game_started = True
+                    start_game()
+            elif event.key == pygame.K_UP and snake_direction != "down":
+                snake_direction = "up"
+            elif event.key == pygame.K_DOWN and snake_direction != "up":
+                snake_direction = "down"
+            elif event.key == pygame.K_LEFT and snake_direction != "right":
+                snake_direction = "left"
+            elif event.key == pygame.K_RIGHT and snake_direction != "left":
+                snake_direction = "right"
+
+    if game_started:
+        # Move the snake
+        if snake_direction == "up":
+            new_head = (snake_pos[0][0], snake_pos[0][1] - snake_speed)
+        elif snake_direction == "down":
+            new_head = (snake_pos[0][0], snake_pos[0][1] + snake_speed)
+        elif snake_direction == "left":
+            new_head = (snake_pos[0][0] - snake_speed, snake_pos[0][1])
+        elif snake_direction == "right":
+            new_head = (snake_pos[0][0] + snake_speed, snake_pos[0][1])
+
+        # Check for collision with the boundaries
+        if new_head[0] < 0 or new_head[0] >= window_width or \
+                new_head[1] < 0 or new_head[1] >= window_height:
+            game_started = False
+
+        # Check for collision with the snake's body
+        if new_head in snake_pos[1:]:
+            game_started = False
+
+        # Check for collision with the food
+        if is_close_to_food():
+            score += 1
+            food_spawned = False
+            eating_sound.play()  # Play the sound effect
+
+            # Grow the snake by inserting a new head position at the front
+            snake_pos.insert(0, new_head)
+        else:
+            # Move the snake by removing the tail and inserting the new head position at the front
+            snake_pos.pop()
+            snake_pos.insert(0, new_head)
+
+        # Spawn new food if necessary
+        if not food_spawned:
+            food_pos = (random.randint(0, (window_width - snake_size) // snake_size) * snake_size,
+                        random.randint(0, (window_height - snake_size) // snake_size) * snake_size)
+            food_spawned = True
+
+        # Draw the background image
+        screen.blit(background_img, (0, 0))
+
+        # Draw the snake's body
+        for pos in snake_pos[1:]:
+            pygame.draw.rect(screen, GREEN, (pos[0], pos[1], snake_size, snake_size))
+
+        # Rotate and draw the snake's head
+        rotated_head = rotate_head(snake_head_img, snake_direction)
+        screen.blit(rotated_head, (snake_pos[0][0], snake_pos[0][1]))
+
+        # Draw the food
+        pygame.draw.circle(screen, RED, (food_pos[0] + snake_size // 2, food_pos[1] + snake_size // 2), snake_size // 2)
+
+        # Draw the volume buttons
+        if mute:
+            screen.blit(vol_off_img, (10, 10))
+        else:
+            screen.blit(vol_on_img, (10, 10))
+
+        # Draw the score
+        display_text("Score: " + str(score), font, WHITE, window_width // 2, 20)
+
+        # Update the display
+        pygame.display.flip()
+
+        # Set the frame rate
+        clock.tick(30)
+    else:
+        # Draw the game over screen
+        screen.blit(game_over_img, (0, 0))
+
+        # Draw the final score
+        display_text("Final Score: " + str(score), bold_font, BLACK, window_width // 2, window_height // 2)
+
+        # Update the display
+        pygame.display.flip()
+
+# Quit the game
+pygame.quit()

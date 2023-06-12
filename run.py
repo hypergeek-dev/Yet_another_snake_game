@@ -34,8 +34,9 @@ snake_size = 20
 snake_speed = 5
 snake_direction = "right"
 
-# Set the initial score
+# Set the initial score and level
 score = 0
+level = 1
 
 # Load the image for the snake's head
 snake_head_img = pygame.image.load("assets/graphic/snake_head.png")

@@ -47,6 +47,13 @@ def is_close_to_food():
     y_distance = abs(snake_pos[0][1] - food_pos[1])
     return x_distance <= snake_size and y_distance <= snake_size
 
+# Create the food at a random position
+food_pos = (
+    random.randint(0, (window_width - snake_size) // snake_size) * snake_size,
+    random.randint((50 + snake_size) // snake_size, (window_height - snake_size) // snake_size) * snake_size,
+)
+food_spawned = True
+
     # Function to rotate the snake's head image
 def rotate_head(image, direction):
     if direction == "up":

@@ -188,62 +188,86 @@ while True:
             # Spawn new food if necessary
             if not food_spawned:
                 food_pos = (
-                    random.randint(0, (window_width - snake_size) // snake_size)
-                    * snake_size,
-                    random.randint(0, (window_height - snake_size - game_bar_height) // snake_size)
-                    * snake_size
+                    random.randint(0, (window_width - snake_size) // snake_size) * snake_size,
+                    random.randint(0, (window_height - snake_size - game_bar_height) // snake_size) * snake_size
                     + game_bar_height,
                 )
                 food_spawned = True
 
-            # Increase the level when the score reaches the required score
-            if score >= required_score:
-                level += 1
+            # Check if the required score for the next level is reached
+            if score - previous_score >= required_score:
                 previous_score = score
-                required_score *= 2
+                level += 1
+                snake_speed += 1
 
         # Clear the screen
         screen.fill(BLACK)
 
-        # Draw the background
+        # Draw the background image
         screen.blit(background_img, (0, 0))
+
+        # Draw the snake
+        for pos in snake_pos:
+            pygame.draw.rect(screen, GREEN, (pos[0], pos[1], snake_size, snake_size))
+
+        # Draw the food
+        pygame.draw.rect(screen, RED, (food_pos[0], food_pos[1], snake_size, snake_size))
+
+        # Draw the snake's head
+        snake_head = rotate_head(snake_head_img, snake_direction)
+        screen.blit(snake_head, (snake_pos[0][0], snake_pos[0][1]))
 
         # Draw the game bar
         pygame.draw.rect(screen, GRAY, (0, 0, window_width, game_bar_height))
 
-        # Display the score, level, and volume button
+        # Display the sound button
+        if sound_on:
+            screen.blit(vol_on_img, (975, window_height - vol_on_img.get_height() - 985))
+        else:
+            screen.blit(vol_off_img, (975, window_height - vol_off_img.get_height() - 985))
+
+        # Display game information
         display_text(f"Score: {score}", font, WHITE, 100, game_bar_height // 2)
         display_text(f"Level: {level}", font, WHITE, window_width // 2, game_bar_height // 2)
-        if sound_on:
-            screen.blit(vol_on_img, (window_width - 80, 5))
-        else:
-            screen.blit(vol_off_img, (window_width - 80, 5))
 
-        if game_over:
-            # Display game over screen
-            screen.blit(game_over_img, (0, 0))
-            display_text("Press SPACE to play again", bold_font, WHITE, window_width // 2, window_height // 2)
 
-        if not game_over:
-            # Draw the snake
-            for pos in snake_pos:
-                pygame.draw.rect(screen, GREEN, (pos[0], pos[1], snake_size, snake_size))
+        # Update the display
+        pygame.display.flip()
 
-            # Draw the food
-            pygame.draw.rect(screen, RED, (food_pos[0], food_pos[1], snake_size, snake_size))
-
-            # Rotate and draw the snake's head
-            rotated_head = rotate_head(snake_head_img, snake_direction)
-            screen.blit(rotated_head, (snake_pos[0][0], snake_pos[0][1]))
-
+        # Control the game's frame rate
+        clock.tick(30)
     else:
         # Display the start screen
         screen.blit(start_screen_img, (0, 0))
-        screen.blit(play_btn_img, (window_width // 2 - 75, window_height // 2 + 50))
+        screen.blit(play_btn_img, ((window_width - play_btn_img.get_width()) // 2, (window_height - play_btn_img.get_height()) // 2))
 
-    # Update the display
-    pygame.display.update()
-    clock.tick(30)
+
+        # Check for button clicks
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_clicked = pygame.mouse.get_pressed()
+
+        if (
+            (window_width - play_btn_img.get_width()) // 2 <= mouse_pos[0] <= (window_width + play_btn_img.get_width()) // 2
+            and (window_height - play_btn_img.get_height()) // 2 <= mouse_pos[1] <= (window_height + play_btn_img.get_height()) // 2
+        ):
+            if mouse_clicked[0]:
+                game_started = True
+                start_game()
+
+        if 10 <= mouse_pos[0] <= 10 + vol_on_img.get_width() and window_height - vol_on_img.get_height() - 10 <= mouse_pos[1] <= window_height - 10:
+            if mouse_clicked[0]:
+                sound_on = not sound_on
+                if sound_on:
+                    pygame.mixer.unpause()
+                else:
+                    pygame.mixer.pause()
+
+        # Update the display
+        pygame.display.flip()
+
+        # Control the game's frame rate
+        clock.tick(30)
+
 
 # Exit the program
 pygame.quit()

@@ -35,6 +35,22 @@ food_pos = (
 )
 food_spawned = True
 
+def create_food():
+    global random_fruit_img
+
+    # Generate a random position for the food
+    x = random.randint(0, (window_width - snake_size) // snake_size) * snake_size
+    y = random.randint(0, (window_height - snake_size - game_bar_height) // snake_size) * snake_size + game_bar_height
+
+    # Generate a new random fruit image if it's the same as the previous one
+    while True:
+        new_fruit_img = random.choice(fruit_images)
+        if new_fruit_img != random_fruit_img:
+            random_fruit_img = new_fruit_img
+            break
+
+    return x, y
+
 # Set the initial score and level
 score = 0
 level = 0
@@ -51,6 +67,13 @@ snake_head_img = pygame.transform.scale(snake_head_img, (snake_size, snake_size)
 background_img = pygame.image.load("assets/graphic/background.png")
 background_img = pygame.transform.scale(background_img, window_size)
 
+# Initialize sound
+pygame.mixer.init()
+sound_on = True
+
+# Load the sound effect for eating
+eating_sound = pygame.mixer.Sound("assets/audio/eating_fx.mp3")
+
 # Load the game over image
 game_over_img = pygame.image.load("assets/graphic/game_over.png")
 game_over_img = pygame.transform.scale(game_over_img, window_size)
@@ -65,6 +88,16 @@ play_btn_img = pygame.image.load("assets/graphic/play_btn.png")
 # Load the mute/volume buttons images
 vol_on_img = pygame.image.load("assets/graphic/volume_on.png")
 vol_off_img = pygame.image.load("assets/graphic/volume_off.png")
+
+fruit1_img = pygame.image.load("assets/graphic/apple.png")
+fruit2_img = pygame.image.load("assets/graphic/pear.png")
+fruit3_img = pygame.image.load("assets/graphic/watermelon.png")
+fruit4_img = pygame.image.load("assets/graphic/strawberry.png")
+
+fruit_images = [fruit1_img, fruit2_img, fruit3_img, fruit4_img]
+
+# Load the random fruit image once at the beginning
+random_fruit_img = random.choice(fruit_images)
 
 # Define the height of the game bar
 game_bar_height = 50
@@ -169,6 +202,7 @@ while True:
             if is_close_to_food():
                 score += 1
                 food_spawned = False
+                eating_sound.play()  # Play the sound effect
 
                 # Grow the snake by inserting a new head position at the front
                 snake_pos.insert(0, new_head)
@@ -176,15 +210,6 @@ while True:
                 # Move the snake by removing the tail and inserting the new head position at the front
                 snake_pos.pop()
                 snake_pos.insert(0, new_head)
-
-            # Spawn new food if necessary
-            if not food_spawned:
-                food_pos = (
-                    random.randint(0, (window_width - snake_size) // snake_size) * snake_size,
-                    random.randint(0, (window_height - snake_size - game_bar_height) // snake_size) * snake_size
-                    + game_bar_height,
-                )
-                food_spawned = True
 
             # Check if the required score for the next level is reached
             if score - previous_score >= required_score:
@@ -202,12 +227,23 @@ while True:
         for pos in snake_pos:
             pygame.draw.rect(screen, GREEN, (pos[0], pos[1], snake_size, snake_size))
 
-        # Draw the food
-        pygame.draw.rect(screen, RED, (food_pos[0], food_pos[1], snake_size, snake_size))
-
         # Draw the snake's head
         snake_head = rotate_head(snake_head_img, snake_direction)
         screen.blit(snake_head, (snake_pos[0][0], snake_pos[0][1]))
+
+        # Draw the food
+        if not food_spawned:
+            # Create a random position for the food
+            food_pos = create_food()
+
+            # Load the random fruit image once at the beginning
+            random_fruit_img = random.choice(fruit_images)
+
+            food_spawned = True
+
+        # Draw the food image
+        screen.blit(random_fruit_img, (food_pos[0], food_pos[1]))
+
 
         # Draw the game bar
         pygame.draw.rect(screen, GRAY, (0, 0, window_width, game_bar_height))
@@ -228,6 +264,7 @@ while True:
 
         # Control the game's frame rate
         clock.tick(30)
+         
     else:
         # Display the start screen
         screen.blit(start_screen_img, (0, 0))
@@ -249,6 +286,10 @@ while True:
         if 10 <= mouse_pos[0] <= 10 + vol_on_img.get_width() and window_height - vol_on_img.get_height() - 10 <= mouse_pos[1] <= window_height - 10:
             if mouse_clicked[0]:
                 sound_on = not sound_on
+                if sound_on:
+                    pygame.mixer.unpause()
+                else:
+                    pygame.mixer.pause()
 
         # Update the display
         pygame.display.flip()

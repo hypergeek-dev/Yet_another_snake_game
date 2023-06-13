@@ -31,16 +31,20 @@ snake_direction = "right"
 # Create the food at a random position
 food_pos = (
     random.randint(0, (window_width - snake_size) // snake_size) * snake_size,
-    random.randint(0, (window_height - snake_size - 50) // snake_size) * snake_size + 50,
+    random.randint(0, (window_height - snake_size - 50) //
+                   snake_size) * snake_size + 50,
 )
 food_spawned = True
+
 
 def create_food():
     global random_fruit_img
 
     # Generate a random position for the food
-    x = random.randint(0, (window_width - snake_size) // snake_size) * snake_size
-    y = random.randint(0, (window_height - snake_size - game_bar_height) // snake_size) * snake_size + game_bar_height
+    x = random.randint(0, (window_width - snake_size) //
+                       snake_size) * snake_size
+    y = random.randint(0, (window_height - snake_size - game_bar_height) //
+                       snake_size) * snake_size + game_bar_height
 
     # Generate a new random fruit image if it's the same as the previous one
     while True:
@@ -50,6 +54,7 @@ def create_food():
             break
 
     return x, y
+
 
 # Set the initial score and level
 score = 0
@@ -61,7 +66,8 @@ bold_font = pygame.font.Font(None, 48)
 
 # Load the image for the snake's head
 snake_head_img = pygame.image.load("assets/graphic/snake_head.png")
-snake_head_img = pygame.transform.scale(snake_head_img, (snake_size, snake_size))
+snake_head_img = pygame.transform.scale(
+    snake_head_img, (snake_size, snake_size))
 
 # Load the background image
 background_img = pygame.image.load("assets/graphic/background.png")
@@ -92,6 +98,8 @@ random_fruit_img = random.choice(fruit_images)
 game_bar_height = 50
 
 # Function to display text on the screen
+
+
 def display_text(text, font, color, x, y):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
@@ -99,12 +107,16 @@ def display_text(text, font, color, x, y):
     screen.blit(text_surface, text_rect)
 
 # Function to check if the snake's head is close to the food
+
+
 def is_close_to_food():
     x_distance = abs(snake_pos[0][0] - food_pos[0])
     y_distance = abs(snake_pos[0][1] - food_pos[1])
     return x_distance <= snake_size and y_distance <= snake_size
 
 # Function to rotate the snake's head image
+
+
 def rotate_head(image, direction):
     if direction == "up":
         return pygame.transform.rotate(image, 90)
@@ -116,6 +128,8 @@ def rotate_head(image, direction):
         return image
 
 # Function to start the game
+
+
 def start_game():
     global snake_pos, snake_direction, score, food_spawned, level
     snake_pos = [(window_width // 2, (window_height // 2) + game_bar_height)]
@@ -123,6 +137,7 @@ def start_game():
     score = 0
     level = 1
     food_spawned = True
+
 
 # Variables to control game state
 game_started = False
@@ -208,7 +223,8 @@ while True:
 
         # Draw the snake
         for pos in snake_pos:
-            pygame.draw.rect(screen, GREEN, (pos[0], pos[1], snake_size, snake_size))
+            pygame.draw.rect(
+                screen, GREEN, (pos[0], pos[1], snake_size, snake_size))
 
         # Draw the snake's head
         snake_head = rotate_head(snake_head_img, snake_direction)
@@ -227,46 +243,38 @@ while True:
         # Draw the food image
         screen.blit(random_fruit_img, (food_pos[0], food_pos[1]))
 
-
         # Draw the game bar
         pygame.draw.rect(screen, GRAY, (0, 0, window_width, game_bar_height))
 
         # Display game information
         display_text(f"Score: {score}", font, WHITE, 100, game_bar_height // 2)
-        display_text(f"Level: {level}", font, WHITE, window_width // 2, game_bar_height // 2)
-
+        display_text(f"Level: {level}", font, WHITE,
+                     window_width // 2, game_bar_height // 2)
 
         # Update the display
         pygame.display.flip()
 
         # Control the game's frame rate
         clock.tick(30)
-         
+
     else:
         # Display the start screen
         screen.blit(start_screen_img, (0, 0))
-        screen.blit(play_btn_img, ((window_width - play_btn_img.get_width()) // 2, (window_height - play_btn_img.get_height()) // 2))
-
+        screen.blit(play_btn_img, ((window_width - play_btn_img.get_width()) //
+                    2, (window_height - play_btn_img.get_height()) // 2))
 
         # Check for button clicks
         mouse_pos = pygame.mouse.get_pos()
         mouse_clicked = pygame.mouse.get_pressed()
 
         if (
-            (window_width - play_btn_img.get_width()) // 2 <= mouse_pos[0] <= (window_width + play_btn_img.get_width()) // 2
+            (window_width - play_btn_img.get_width()
+             ) // 2 <= mouse_pos[0] <= (window_width + play_btn_img.get_width()) // 2
             and (window_height - play_btn_img.get_height()) // 2 <= mouse_pos[1] <= (window_height + play_btn_img.get_height()) // 2
         ):
             if mouse_clicked[0]:
                 game_started = True
                 start_game()
-
-        if 10 <= mouse_pos[0] <= 10 + vol_on_img.get_width() and window_height - vol_on_img.get_height() - 10 <= mouse_pos[1] <= window_height - 10:
-            if mouse_clicked[0]:
-                sound_on = not sound_on
-                if sound_on:
-                    pygame.mixer.unpause()
-                else:
-                    pygame.mixer.pause()
 
         # Update the display
         pygame.display.flip()

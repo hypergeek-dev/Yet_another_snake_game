@@ -67,9 +67,6 @@ snake_head_img = pygame.transform.scale(snake_head_img, (snake_size, snake_size)
 background_img = pygame.image.load("assets/graphic/background.png")
 background_img = pygame.transform.scale(background_img, window_size)
 
-# Load the sound effect for eating
-eating_sound = pygame.mixer.Sound("assets/audio/eating_fx.mp3")
-
 # Load the game over image
 game_over_img = pygame.image.load("assets/graphic/game_over.png")
 game_over_img = pygame.transform.scale(game_over_img, window_size)

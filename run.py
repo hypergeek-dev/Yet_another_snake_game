@@ -51,13 +51,6 @@ snake_head_img = pygame.transform.scale(snake_head_img, (snake_size, snake_size)
 background_img = pygame.image.load("assets/graphic/background.png")
 background_img = pygame.transform.scale(background_img, window_size)
 
-# Initialize sound
-pygame.mixer.init()
-sound_on = True
-
-# Load the sound effect for eating
-eating_sound = pygame.mixer.Sound("assets/audio/eating_fx.mp3")
-
 # Load the game over image
 game_over_img = pygame.image.load("assets/graphic/game_over.png")
 game_over_img = pygame.transform.scale(game_over_img, window_size)
@@ -176,7 +169,6 @@ while True:
             if is_close_to_food():
                 score += 1
                 food_spawned = False
-                eating_sound.play()  # Play the sound effect
 
                 # Grow the snake by inserting a new head position at the front
                 snake_pos.insert(0, new_head)
@@ -257,10 +249,6 @@ while True:
         if 10 <= mouse_pos[0] <= 10 + vol_on_img.get_width() and window_height - vol_on_img.get_height() - 10 <= mouse_pos[1] <= window_height - 10:
             if mouse_clicked[0]:
                 sound_on = not sound_on
-                if sound_on:
-                    pygame.mixer.unpause()
-                else:
-                    pygame.mixer.pause()
 
         # Update the display
         pygame.display.flip()

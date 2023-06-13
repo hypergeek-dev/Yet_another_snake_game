@@ -67,10 +67,6 @@ snake_head_img = pygame.transform.scale(snake_head_img, (snake_size, snake_size)
 background_img = pygame.image.load("assets/graphic/background.png")
 background_img = pygame.transform.scale(background_img, window_size)
 
-# Initialize sound
-pygame.mixer.init()
-sound_on = True
-
 # Load the sound effect for eating
 eating_sound = pygame.mixer.Sound("assets/audio/eating_fx.mp3")
 
@@ -84,10 +80,6 @@ start_screen_img = pygame.transform.scale(start_screen_img, window_size)
 
 # Load the play button image
 play_btn_img = pygame.image.load("assets/graphic/play_btn.png")
-
-# Load the mute/volume buttons images
-vol_on_img = pygame.image.load("assets/graphic/volume_on.png")
-vol_off_img = pygame.image.load("assets/graphic/volume_off.png")
 
 fruit1_img = pygame.image.load("assets/graphic/apple.png")
 fruit2_img = pygame.image.load("assets/graphic/pear.png")
@@ -158,12 +150,6 @@ while True:
                 elif not game_started:  # Start the game when Space is pressed for the first time
                     game_started = True
                     start_game()
-            elif event.key == pygame.K_m:
-                sound_on = not sound_on
-                if sound_on:
-                    pygame.mixer.unpause()
-                else:
-                    pygame.mixer.pause()
             elif event.key == pygame.K_UP and snake_direction != "down":
                 snake_direction = "up"
             elif event.key == pygame.K_DOWN and snake_direction != "up":
@@ -247,12 +233,6 @@ while True:
 
         # Draw the game bar
         pygame.draw.rect(screen, GRAY, (0, 0, window_width, game_bar_height))
-
-        # Display the sound button
-        if sound_on:
-            screen.blit(vol_on_img, (975, window_height - vol_on_img.get_height() - 985))
-        else:
-            screen.blit(vol_off_img, (975, window_height - vol_off_img.get_height() - 985))
 
         # Display game information
         display_text(f"Score: {score}", font, WHITE, 100, game_bar_height // 2)
